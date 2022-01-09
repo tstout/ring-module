@@ -1,0 +1,4 @@
+[{:sys/description "ring module"
+  :sys/name        :ring-module
+  :sys/deps        [:sys/logging]
+  :sys/init        ring-module.core/init}]

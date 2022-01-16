@@ -1,6 +1,7 @@
 (ns ring-module.router
   (:require
    [iapetos.collector.jvm :as jvm]
+   [ring.util.response :refer [response bad-request]]
    [iapetos.collector.ring :as ring]
    [iapetos.core :as prometheus]
    [taoensso.timbre :as log]
@@ -21,24 +22,6 @@
   (fn [request]
     (handler (assoc request :env env))))
 
-(defn read-body
-  "In Ring, the http body is actualy a java InputStream.
-   This function consumes the InputStream and converts the resulting 
-   string into a clojure persistent data structure."
-  [body]
-  (-> body slurp))
-
-(defn mk-response
-  "Create a ring response map"
-  ([body]
-   (mk-response body 200))
-  ([body status]
-   (mk-response body status {"Content-Type" "application/json"}))
-  ([body status headers]
-   {:status  status
-    :headers headers
-    :body    body}))
-
 (defn not-only-digits? [s]
   (not (every? #(Character/isDigit %) s)))
 
@@ -58,12 +41,12 @@
    For example: 
    
    (defmethod router [\"/v1/lookup/\" :get] [request]
-   ...)   
+   ...)
    "
   (juxt normalize-uri :request-method))
 
 (defmethod router ["/health" :get] [_]
-  (mk-response
+  (response
    (->
     {:health
      {:status "NORMAL"
@@ -74,8 +57,8 @@
 (defmethod router :default [request]
   (let [{:keys [uri]} request]
     (log/debugf "Unrecognized URI %s" uri)
-    (log/debugf "Complete Response: %s" request)
-    (mk-response (str "Unknown URI " uri) 400)))
+    ;;(log/debugf "Complete Response: %s" request)
+    (bad-request (str "Unknown URI " uri))))
 
 (defn handler [request]
   (let [{:keys [uri]} request]
@@ -83,10 +66,11 @@
     (router request)))
 
 (comment
-  ;; REPL experiments
   (router {:uri "/health" :request-method :get})
+  (router {:uri "/ping" :request-method :get})
 
-  (normalize-uri-for-route {:uri "/v1/a/b/c/3872"})
+
+  (normalize-uri {:uri "/v1/a/b/c/3872"})
 
   (rest (split "/v1/v2/abc" #"/"))
 
@@ -94,6 +78,8 @@
    (split "v1/foo/123" #"/")
    (take-while not-only-digits?)
    (join "/"))
+
+  (meta #'router)
   ;;
   )
 

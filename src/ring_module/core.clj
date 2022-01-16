@@ -3,6 +3,7 @@
    [taoensso.timbre :as log]
    [iapetos.collector.ring :as ring]
    [ring.adapter.jetty :refer [run-jetty]]
+   [ring-module.ping]
    [ring-module.router :refer [handler registry]]))
 
 (defn init [_]

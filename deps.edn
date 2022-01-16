@@ -6,6 +6,7 @@
                                  :git/tag "v5.1.2t" :git/sha "fea330b"}
         clj-commons/iapetos     {:mvn/version "0.1.9"}
         io.prometheus/simpleclient_hotspot {:mvn/version "0.6.0"}}
+ :paths ["resources" "src"]
  :aliases
  {:ring-module {:main-opts ["-m" "ring-module.core"]}
   :dev {:extra-paths ["dev"]
@@ -26,5 +27,4 @@
     {:git/url "https://github.com/cognitect-labs/test-runner.git"
      :sha "209b64504cb3bd3b99ecfec7937b358a879f55c1"}}
    :extra-paths ["test"]
-   :main-opts ["-m" "cognitect.test-runner" "-d" "test"]}}
- :paths ["resources" "src"]}
+   :main-opts ["-m" "cognitect.test-runner" "-d" "test"]}}}

@@ -1,11 +1,10 @@
 (ns ring-module.router
   (:require
    [iapetos.collector.jvm :as jvm]
-   [ring.util.response :refer [response bad-request]]
+   [ring.util.response :refer [bad-request resource-response]]
    [iapetos.collector.ring :as ring]
    [iapetos.core :as prometheus]
    [taoensso.timbre :as log]
-   [clojure.data.json :as json]
    [clojure.string :refer [split join]]))
 
 ;; TODO - this probably belongs in core, not here
@@ -37,7 +36,7 @@
 
 (defmulti router
   "An open-ended ring router. It is intended that applications will provide their own
-   implmentations as needed. The dispatch function returns a vector of [:uri :request-method]
+   implmentations as needed. The dispatch function returns a vector of [uri :request-method]
    For example: 
    
    (defmethod router [\"/v1/lookup/\" :get] [request]
@@ -45,14 +44,8 @@
    "
   (juxt normalize-uri :request-method))
 
-(defmethod router ["/health" :get] [_]
-  (response
-   (->
-    {:health
-     {:status "NORMAL"
-      :healthAssessments []}
-     :_links {:self {:href "/health"}}}
-    (json/write-str :escape-slash false))))
+(defmethod router ["/favicon.ico" :get] [_]
+  (resource-response "clojure.png" {:root "public"}))
 
 (defmethod router :default [request]
   (let [{:keys [uri]} request]
@@ -78,6 +71,8 @@
    (split "v1/foo/123" #"/")
    (take-while not-only-digits?)
    (join "/"))
+
+  (resource-response "clojure.png" {:root "public"})
 
   (meta #'router)
   ;;

@@ -12,6 +12,11 @@ The namespace ring-module.router contains a multimethod for apps to define their
 The dispatch function of router returns a vector of [uri :request-method] extracted from the 
 ring request map.
    For example: 
+   ```clojure
+   (ns an.example
+     (:require [ring-module.router :refer [router]]))
    
    (defmethod router ["/v1/lookup/" :get] [request]
-   ...)
+   ;; process ring request and respond with a ring response
+   )
+   ```

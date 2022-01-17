@@ -7,7 +7,7 @@
    [ring-module.router :refer [handler registry]]))
 
 (defn init [_]
-  (log/info "Starting server on port 8080")
+  (log/info "Starting jetty server on port 8080")
   (run-jetty (-> #'handler
                  #_(wrap-env env)
                  (ring/wrap-metrics registry)

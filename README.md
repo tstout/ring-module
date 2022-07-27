@@ -1,6 +1,13 @@
 # ring-module
 A [sys-loader](https://github.com/tstout/sys-loader) module for adding base http server functionality. This module spins up a jetty web server, with a couple of endpoints.
 
+## Usage - deps.edn coordinates
+```clojure
+  com.github.tstout/ring-module
+    {:git/url "https://github.com/tstout/ring-module"
+     :git/tag "v1.0.0"
+     :git/sha "e7a240e"}
+```
 ## Endpoints
 ```
 /ping - responds with jvm process uptime in a human-friendly format.

@@ -24,8 +24,13 @@
 (defn not-only-digits? [s]
   (not (every? #(Character/isDigit %) s)))
 
+
+;; TODO - this URI scheme to determine dispatch is very constrained.
+;; Consider something more flexible. Perhaps multimethods are not the right 
+;; choice for a routing API.
+;;
 (defn normalize-uri
-  "Given a ring request, transform a uri to exclude a numeric component.
+  "Given a ring request, transform a URI to exclude a numeric component.
    For example, /v1/foo/bar/12848 becomes /v1/foo/bar"
   [request]
   (let [uri-elements (-> :uri request (split #"/") rest)]
@@ -33,6 +38,13 @@
          (take-while not-only-digits?)
          (join "/")
          (str "/"))))
+
+;; (defmulti normalize-uri :uri)
+
+;; (defmethod normalize-uri "/favicon.ico" [req]
+;;   )
+
+
 
 (defmulti router
   "An open-ended ring router. It is intended that applications will provide their own
@@ -74,7 +86,9 @@
 
   (resource-response "clojure.png" {:root "public"})
 
+  (#'router {:uri "a/b/c"})
   (meta #'router)
+  
   ;;
   )
 

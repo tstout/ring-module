@@ -24,6 +24,29 @@
 (defn not-only-digits? [s]
   (not (every? #(Character/isDigit %) s)))
 
+(defn default-uri-handler [uri]
+  (if (#{"/favicon.ico" "/ping"} uri)
+    uri
+    nil))
+
+(def uri-registry (atom [default-uri-handler]))
+
+(defn register-uri-handler [f]
+  {:pre [(fn? f)]}
+  ;;(log/debugf "Registering uri handler %s" (var f))
+  (swap! uri-registry conj f))
+
+;; TODO - might be a more idiomatic way to achieve this.
+(defn uri-dispatch
+  "Invoke each URI handler with a URI. Returns the first non nil result
+   of the handlers, nil if no handler returned a non nill value"
+  [uri]
+  (loop [handlers @uri-registry]
+    (if (empty? handlers)
+      nil
+      (if-let [value ((first handlers) uri)]
+        value
+        (recur (rest handlers))))))
 
 ;; TODO - this URI scheme to determine dispatch is very constrained.
 ;; Consider something more flexible. Perhaps multimethods are not the right 
@@ -39,13 +62,6 @@
          (join "/")
          (str "/"))))
 
-;; (defmulti normalize-uri :uri)
-
-;; (defmethod normalize-uri "/favicon.ico" [req]
-;;   )
-
-
-
 (defmulti router
   "An open-ended ring router. It is intended that applications will provide their own
    implmentations as needed. The dispatch function returns a vector of [uri :request-method]
@@ -54,7 +70,7 @@
    (defmethod router [\"/v1/lookup/\" :get] [request]
    ...)
    "
-  (juxt normalize-uri :request-method))
+  (juxt #(uri-dispatch (:uri %)) :request-method))
 
 (defmethod router ["/favicon.ico" :get] [_]
   (resource-response "clojure.png" {:root "public"}))
@@ -71,8 +87,17 @@
     (router request)))
 
 (comment
+  *e
+  (uri-dispatch "/favicon.ico")
+  (uri-dispatch "/ping")
+  (register-uri-handler (fn [_] 1))
+
+  @uri-registry
   (router {:uri "/health" :request-method :get})
   (router {:uri "/ping" :request-method :get})
+
+
+
 
 
   (normalize-uri {:uri "/v1/a/b/c/3872"})
@@ -88,7 +113,9 @@
 
   (#'router {:uri "a/b/c"})
   (meta #'router)
-  
+
+
+
   ;;
   )
 

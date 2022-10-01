@@ -4,8 +4,7 @@
    [ring.util.response :refer [bad-request resource-response]]
    [iapetos.collector.ring :as ring]
    [iapetos.core :as prometheus]
-   [taoensso.timbre :as log]
-   [clojure.string :refer [split join]]))
+   [taoensso.timbre :as log]))
 
 ;; TODO - this probably belongs in core, not here
 (defonce registry
@@ -21,17 +20,20 @@
   (fn [request]
     (handler (assoc request :env env))))
 
-(defn not-only-digits? [s]
-  (not (every? #(Character/isDigit %) s)))
-
 (defn default-uri-handler [uri]
   (if (#{"/favicon.ico" "/ping"} uri)
     uri
     nil))
 
+;; TODO - consider having a map here instead of a vector for 
+;; easier removal of handlers. Leaving out for now, as I don't 
+;; feel removal is something useful.
 (def uri-registry (atom [default-uri-handler]))
 
-(defn register-uri-handler [f]
+(defn register-uri-handler
+  "Register a fn which will be be composed with the router multimethod 
+   dispatch function."
+  [f]
   {:pre [(fn? f)]}
   ;;(log/debugf "Registering uri handler %s" (var f))
   (swap! uri-registry conj f))
@@ -48,20 +50,6 @@
         value
         (recur (rest handlers))))))
 
-;; TODO - this URI scheme to determine dispatch is very constrained.
-;; Consider something more flexible. Perhaps multimethods are not the right 
-;; choice for a routing API.
-;;
-(defn normalize-uri
-  "Given a ring request, transform a URI to exclude a numeric component.
-   For example, /v1/foo/bar/12848 becomes /v1/foo/bar"
-  [request]
-  (let [uri-elements (-> :uri request (split #"/") rest)]
-    (->> uri-elements
-         (take-while not-only-digits?)
-         (join "/")
-         (str "/"))))
-
 (defmulti router
   "An open-ended ring router. It is intended that applications will provide their own
    implmentations as needed. The dispatch function returns a vector of [uri :request-method]
@@ -69,6 +57,9 @@
    
    (defmethod router [\"/v1/lookup/\" :get] [request]
    ...)
+
+   The first item of the vector returned by the dispatch fn is determined by
+   functions registerd via register-uri-handler.
    "
   (juxt #(uri-dispatch (:uri %)) :request-method))
 
@@ -89,32 +80,16 @@
 (comment
   *e
   (uri-dispatch "/favicon.ico")
-  (uri-dispatch "/ping")
-  (register-uri-handler (fn [_] 1))
+  (uri-dispatch "/ping2")
+
+  (register-uri-handler #(fn [_] nil))
 
   @uri-registry
   (router {:uri "/health" :request-method :get})
   (router {:uri "/ping" :request-method :get})
 
-
-
-
-
-  (normalize-uri {:uri "/v1/a/b/c/3872"})
-
-  (rest (split "/v1/v2/abc" #"/"))
-
-  (->>
-   (split "v1/foo/123" #"/")
-   (take-while not-only-digits?)
-   (join "/"))
-
-  (resource-response "clojure.png" {:root "public"})
-
-  (#'router {:uri "a/b/c"})
-  (meta #'router)
-
-
+  @uri-registry
+  (count @uri-registry)
 
   ;;
   )

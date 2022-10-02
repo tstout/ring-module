@@ -26,7 +26,7 @@
     nil))
 
 ;; TODO - consider having a map here instead of a vector for 
-;; easier removal of handlers. Leaving out for now, as I don't 
+;; easier removal of handlers. Leaving for now, as I don't 
 ;; feel removal is something useful.
 (def uri-registry (atom [default-uri-handler]))
 

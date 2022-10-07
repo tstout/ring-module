@@ -21,14 +21,19 @@
     (handler (assoc request :env env))))
 
 (defn default-uri-handler [uri]
-  (if (#{"/favicon.ico" "/ping"} uri)
-    uri
-    nil))
+  (when (#{"/favicon.ico" "/ping"} uri)
+    uri))
 
 ;; TODO - consider having a map here instead of a vector for 
 ;; easier removal of handlers. Leaving for now, as I don't 
 ;; feel removal is something useful.
 (def uri-registry (atom [default-uri-handler]))
+
+(defn reset-registry!
+  "Reset the uri-registry to just the default-uri-handler.
+   Intended for REPL use only."
+  []
+  (reset! uri-registry [default-uri-handler]))
 
 (defn register-uri-handler
   "Register a fn which will be be composed with the router multimethod 
@@ -40,8 +45,9 @@
 
 ;; TODO - might be a more idiomatic way to achieve this.
 (defn uri-dispatch
-  "Invoke each URI handler with a URI. Returns the first non nil result
-   of the handlers, nil if no handler returned a non nill value"
+  "Invoke each URI handler with a URI from a ring request. Returns the 
+   first non nil result of the handlers, nil if no handler returned a 
+   non nill value"
   [uri]
   (loop [handlers @uri-registry]
     (if (empty? handlers)
@@ -82,6 +88,7 @@
   (uri-dispatch "/favicon.ico")
   (uri-dispatch "/ping2")
 
+  (reset-registry!)
   (register-uri-handler #(fn [_] nil))
 
   @uri-registry

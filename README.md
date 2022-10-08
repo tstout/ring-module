@@ -34,4 +34,4 @@ The purpose of the registered uri handler fn is to look at the URI and decide wh
    ;; process ring request and respond with a ring response
    )
    ```
-   The registred-fn
+   

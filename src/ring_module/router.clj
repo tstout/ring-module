@@ -46,8 +46,8 @@
 ;; TODO - might be a more idiomatic way to achieve this.
 (defn uri-dispatch
   "Invoke each URI handler with a URI from a ring request. Returns the 
-   first non nil result of the handlers, nil if no handler returned a 
-   non nill value"
+   first non nil result of the handlers registered via register-uri-handler.
+   Returns nil if no handler returned a non nill value"
   [uri]
   (loop [handlers @uri-registry]
     (if (empty? handlers)
@@ -83,6 +83,7 @@
     (log/debugf "Processing URI %s" uri)
     (router request)))
 
+
 (comment
   *e
   (uri-dispatch "/favicon.ico")
@@ -97,7 +98,6 @@
 
   @uri-registry
   (count @uri-registry)
-
   ;;
   )
 

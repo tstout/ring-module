@@ -3,7 +3,8 @@
         ring/ring-jetty-adapter {:mvn/version "1.8.0"}
         org.clojure/tools.cli   {:mvn/version "0.3.5"}
         com.taoensso/timbre     {:git/url "https://github.com/tstout/timbre.git"
-                                 :git/tag "v5.1.2t" :git/sha "fea330b"}
+                                 :git/tag "v5.1.2t" 
+                                 :git/sha "fea330b"}
         clj-commons/iapetos     {:mvn/version "0.1.9"}
         io.prometheus/simpleclient_hotspot {:mvn/version "0.6.0"}}
  :paths ["resources" "src"]

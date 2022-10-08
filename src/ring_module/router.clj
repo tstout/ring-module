@@ -4,8 +4,7 @@
    [ring.util.response :refer [bad-request resource-response]]
    [iapetos.collector.ring :as ring]
    [iapetos.core :as prometheus]
-   [taoensso.timbre :as log]
-   [clojure.string :refer [split join]]))
+   [taoensso.timbre :as log]))
 
 ;; TODO - this probably belongs in core, not here
 (defonce registry
@@ -21,30 +20,41 @@
   (fn [request]
     (handler (assoc request :env env))))
 
-(defn not-only-digits? [s]
-  (not (every? #(Character/isDigit %) s)))
+(defn default-uri-handler [uri]
+  (when (#{"/favicon.ico" "/ping"} uri)
+    uri))
 
+;; TODO - consider having a map here instead of a vector for 
+;; easier removal of handlers. Leaving for now, as I don't 
+;; feel removal is something useful.
+(def uri-registry (atom [default-uri-handler]))
 
-;; TODO - this URI scheme to determine dispatch is very constrained.
-;; Consider something more flexible. Perhaps multimethods are not the right 
-;; choice for a routing API.
-;;
-(defn normalize-uri
-  "Given a ring request, transform a URI to exclude a numeric component.
-   For example, /v1/foo/bar/12848 becomes /v1/foo/bar"
-  [request]
-  (let [uri-elements (-> :uri request (split #"/") rest)]
-    (->> uri-elements
-         (take-while not-only-digits?)
-         (join "/")
-         (str "/"))))
+(defn reset-registry!
+  "Reset the uri-registry to just the default-uri-handler.
+   Intended for REPL use only."
+  []
+  (reset! uri-registry [default-uri-handler]))
 
-;; (defmulti normalize-uri :uri)
+(defn register-uri-handler
+  "Register a fn which will be be composed with the router multimethod 
+   dispatch function."
+  [f]
+  {:pre [(fn? f)]}
+  ;;(log/debugf "Registering uri handler %s" (var f))
+  (swap! uri-registry conj f))
 
-;; (defmethod normalize-uri "/favicon.ico" [req]
-;;   )
-
-
+;; TODO - might be a more idiomatic way to achieve this.
+(defn uri-dispatch
+  "Invoke each URI handler with a URI from a ring request. Returns the 
+   first non nil result of the handlers registered via register-uri-handler.
+   Returns nil if no handler returned a non nill value"
+  [uri]
+  (loop [handlers @uri-registry]
+    (if (empty? handlers)
+      nil
+      (if-let [value ((first handlers) uri)]
+        value
+        (recur (rest handlers))))))
 
 (defmulti router
   "An open-ended ring router. It is intended that applications will provide their own
@@ -53,8 +63,11 @@
    
    (defmethod router [\"/v1/lookup/\" :get] [request]
    ...)
+
+   The first item of the vector returned by the dispatch fn is determined by
+   functions registerd via register-uri-handler.
    "
-  (juxt normalize-uri :request-method))
+  (juxt #(uri-dispatch (:uri %)) :request-method))
 
 (defmethod router ["/favicon.ico" :get] [_]
   (resource-response "clojure.png" {:root "public"}))
@@ -70,25 +83,20 @@
     (log/debugf "Processing URI %s" uri)
     (router request)))
 
+
 (comment
+  *e
+  (uri-dispatch "/favicon.ico")
+  (uri-dispatch "/ping2")
+
+  (reset-registry!)
+  (register-uri-handler #(fn [_] nil))
+
+  @uri-registry
   (router {:uri "/health" :request-method :get})
   (router {:uri "/ping" :request-method :get})
-
-
-  (normalize-uri {:uri "/v1/a/b/c/3872"})
-
-  (rest (split "/v1/v2/abc" #"/"))
-
-  (->>
-   (split "v1/foo/123" #"/")
-   (take-while not-only-digits?)
-   (join "/"))
-
-  (resource-response "clojure.png" {:root "public"})
-
-  (#'router {:uri "a/b/c"})
-  (meta #'router)
   
+  (count @uri-registry)
   ;;
   )
 

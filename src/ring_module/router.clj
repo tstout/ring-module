@@ -95,8 +95,7 @@
   @uri-registry
   (router {:uri "/health" :request-method :get})
   (router {:uri "/ping" :request-method :get})
-
-  @uri-registry
+  
   (count @uri-registry)
   ;;
   )

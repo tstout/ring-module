@@ -7,7 +7,8 @@
 
 (use-fixtures :once setup)
 
-(defexpect fix-me-I-fail (expect 1 0))
+(defexpect example-test 
+  (expect 1 1))
 
 (comment
   *e

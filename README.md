@@ -5,8 +5,8 @@ A [sys-loader](https://github.com/tstout/sys-loader) module for adding base http
 ```clojure
   com.github.tstout/ring-module
     {:git/url "https://github.com/tstout/ring-module"
-     :git/tag "v1.0.0"
-     :git/sha "e7a240e"}
+     :git/tag "v1.0.1"
+     :git/sha "5a77447"}
 ```
 ## Endpoints
 ```

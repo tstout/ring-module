@@ -24,11 +24,10 @@ The purpose of the registered uri handler fn is to look at the URI and decide wh
      (:require [ring-module.router :refer [router register-uri-handler]]
                [clojure.string :refer [starts-with?]]))
    
-   (defn lookup-handler [uri]
-    (when (starts-with? uri "/v1/service/lookup")
-      "/v1/service/lookup"))
-
-   (register-uri-handler lookup-handler)
+   (register-uri-handler (fn [uri]
+                           (let [path "/v1/service/lookup"]
+                             (when (starts-with? uri path)
+                               path))))
 
    (defmethod router ["/v1/service/lookup" :get] [request]
    ;; process ring request and respond with a ring response

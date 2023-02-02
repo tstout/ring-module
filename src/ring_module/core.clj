@@ -1,6 +1,6 @@
 (ns ring-module.core
   (:require
-   [taoensso.timbre :as log]
+   [clojure.tools.logging :as log]
    [iapetos.collector.ring :as ring]
    [ring.adapter.jetty :refer [run-jetty]]
    [ring.middleware.params :refer [wrap-params]]

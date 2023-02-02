@@ -4,7 +4,7 @@
    [ring.util.response :refer [bad-request resource-response]]
    [iapetos.collector.ring :as ring]
    [iapetos.core :as prometheus]
-   [taoensso.timbre :as log]))
+   [clojure.tools.logging :as log]))
 
 ;; TODO - this probably belongs in core, not here
 (defonce registry
@@ -95,7 +95,7 @@
   @uri-registry
   (router {:uri "/health" :request-method :get})
   (router {:uri "/ping" :request-method :get})
-  
+
   (count @uri-registry)
   ;;
   )

@@ -1,11 +1,9 @@
-{:deps {ring/ring-core          {:mvn/version "1.8.0"}
-        org.clojure/data.json   {:mvn/version "1.0.0"}
-        ring/ring-jetty-adapter {:mvn/version "1.8.0"}
-        org.clojure/tools.cli   {:mvn/version "0.3.5"}
-        com.taoensso/timbre     {:git/url "https://github.com/tstout/timbre.git"
-                                 :git/tag "v5.1.2t" 
-                                 :git/sha "fea330b"}
-        clj-commons/iapetos     {:mvn/version "0.1.9"}
+{:deps {ring/ring-core            {:mvn/version "1.8.0"}
+        org.clojure/data.json     {:mvn/version "1.0.0"}
+        ring/ring-jetty-adapter   {:mvn/version "1.8.0"}
+        org.clojure/tools.cli     {:mvn/version "0.3.5"}
+        org.clojure/tools.logging {:mvn/version "1.2.4"}
+        clj-commons/iapetos       {:mvn/version "0.1.9"}
         io.prometheus/simpleclient_hotspot {:mvn/version "0.6.0"}}
  :paths ["resources" "src"]
  :aliases

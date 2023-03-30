@@ -15,11 +15,11 @@
    :extra-deps
    {org.clojure/test.check {:mvn/version "0.10.0"}
     com.github.clojure-expectations/clojure-test
-    {:git/sha "3a2188d" 
+    {:git/sha "3a2188d"
      :git/tag "v2.0.165"}
-    pjstadig/humane-test-output
-    {:git/url "https://github.com/pjstadig/humane-test-output"
-     :sha "063ee9ff5adc5cf94ff7ab790ad6a80e6263ebc8"}}}
+    com.github.pjstadig/humane-test-output
+    {:git/tag "0.11.0"
+     :git/sha "063ee9f"}}}
   :runner
   {:extra-deps
    {com.cognitect/test-runner

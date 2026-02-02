@@ -44,6 +44,7 @@
   (swap! uri-registry conj f))
 
 ;; TODO - might be a more idiomatic way to achieve this.
+;; Yes there is...use some-fn
 (defn uri-dispatch
   "Invoke each URI handler with a URI from a ring request. Returns the 
    first non nil result of the handlers registered via register-uri-handler.
